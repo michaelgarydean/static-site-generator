@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Set-up the Apache virtual host for a new state site
+#
+# @author   Michael Gary Dean
+# @contact  <contact@michaeldean.ca>
+# @web      michaeldean.ca
+# @github   github.com/mykedean 
+
+# create error message if arguments weren't passed in
+usage() { echo "Usage: $0 [-s <string>]" 1>&2; exit 1; }
+
+# read arguments
+while getopts ":s:" option; do
+    case "${option}" in
+        s)
+            s=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${s}" ]; then
+    usage
+fi
+
+# set up variables
+SITENAME=${s}
+SERVER="michaeldean.ca"
+DOCROOT=/var/www/${SITENAME}/
+DOCDIR=${DOCROOT}docs/
+LOGDIR=${DOCROOT}logs/
+SERVER="michaeldean.ca"
+
+APACHEDIR="/etc/apache2/sites-available/";
+
+# Create configuration file for new domain
+sudo tee -a ${APACHEDIR}${SITENAME}.conf > /dev/null <<EOL
+<VirtualHost *:80>
+
+        ServerName ${SITENAME}
+
+        DocumentRoot ${DOCDIR}
+
+        ErrorLog ${LOGDIR}error.log
+        CustomLog ${LOGDIR}access.log combined
+
+</VirtualHost>
+EOL
+
+# Make directories for site
+sudo mkdir -p ${DOCDIR}
+sudo mkdir ${LOGDIR}
+
+# Properly set up users and groups
+sudo chown -R $USER:www-pub ${DOCROOT}
+
+# Set-up initial permissions
+
+# Enable vhost and restart apache
+sudo a2ensite ${SITENAME}.conf
+sudo service apache2 reload
