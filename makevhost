@@ -42,6 +42,7 @@ sudo tee -a ${APACHEDIR}${SITENAME}.conf > /dev/null <<EOL
 <VirtualHost *:80>
 
         ServerName ${SITENAME}
+        ServerAlias www.${SITENAME}
 
         DocumentRoot ${DOCDIR}
 
