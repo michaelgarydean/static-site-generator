@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# Set-up basic file permissions for a new state site
+#
+# @author   Michael Gary Dean
+# @contact  <contact@michaeldean.ca>
+# @web      michaeldean.ca
+# @github   github.com/mykedean 
+
+# create error message if arguments weren't passed in
+usage() { echo "Usage: $0 [-s <string>]" 1>&2; exit 1; }
+
+# read arguments
+while getopts ":s:" option; do
+    case "${option}" in
+        s)
+            s=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${s}" ]; then
+    usage
+fi
+
+# set up variables
+SITENAME=${s}
+DOCROOT=/var/www/${SITENAME}/
+DOCDIR=${DOCROOT}docs/
+LOGDIR=${DOCROOT}logs/
+
+# Set-up initial permissions
+find ${DOCDIR} -type d -exec chmod 750 {} \;
+find ${DOCDIR} -type f -exec chmod 640 {} \;
